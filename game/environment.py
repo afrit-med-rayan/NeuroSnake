@@ -76,3 +76,32 @@ class SnakeGameAI:
         pygame.font.init()
         self.font_large  = pygame.font.SysFont("consolas", 28, bold=True)
         self.font_small  = pygame.font.SysFont("consolas", 18)
+
+    def reset(self):
+        """Reset the game to starting state. Returns initial state vector."""
+        # Snake starts in the middle, moving right
+        mid_x = (config.GRID_SIZE // 2) * config.CELL_SIZE
+        mid_y = (config.GRID_SIZE // 2) * config.CELL_SIZE
+        self.direction = Direction.RIGHT
+        self.head = Point(mid_x, mid_y)
+        self.snake = [
+            self.head,
+            Point(self.head.x - config.CELL_SIZE,     self.head.y),
+            Point(self.head.x - 2 * config.CELL_SIZE, self.head.y),
+        ]
+        self.score      = 0
+        self.food       = None
+        self.frame_iter = 0
+        self._place_food()
+        return self.get_state()
+
+    def _place_food(self):
+        """Spawn food at a random cell not occupied by the snake."""
+        cs = config.CELL_SIZE
+        while True:
+            x = random.randint(0, config.GRID_SIZE - 1) * cs
+            y = random.randint(0, config.GRID_SIZE - 1) * cs
+            self.food = Point(x, y)
+            if self.food not in self.snake:
+                break
+
