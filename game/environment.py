@@ -105,3 +105,49 @@ class SnakeGameAI:
             if self.food not in self.snake:
                 break
 
+    # ── Collision ────────────────────────────────────────────────────────
+
+    def _is_collision(self, point: Point = None) -> bool:
+        """Return True if point (default: head) hits a wall or the snake body."""
+        if point is None:
+            point = self.head
+
+        cs = config.CELL_SIZE
+        gs = config.GRID_SIZE
+
+        # Wall collision
+        if (point.x < 0 or point.x >= gs * cs or
+                point.y < 0 or point.y >= gs * cs):
+            return True
+
+        # Self collision (skip the head itself)
+        if point in self.snake[1:]:
+            return True
+
+        return False
+
+    # ── Movement ─────────────────────────────────────────────────────────
+
+    def _move(self, action: list):
+        """
+        Translate action [straight, right, left] into a new head position.
+        Uses clock-wise rotation relative to current direction.
+        """
+        idx = CLOCK_WISE.index(self.direction)
+
+        if action[1]:           # Turn right (clock-wise)
+            idx = (idx + 1) % 4
+        elif action[2]:         # Turn left (counter-clock-wise)
+            idx = (idx - 1) % 4
+        # action[0] == straight → idx unchanged
+
+        self.direction = CLOCK_WISE[idx]
+        cs = config.CELL_SIZE
+        x, y = self.head.x, self.head.y
+
+        if   self.direction == Direction.RIGHT: x += cs
+        elif self.direction == Direction.LEFT:  x -= cs
+        elif self.direction == Direction.DOWN:  y += cs
+        elif self.direction == Direction.UP:    y -= cs
+
+        self.head = Point(x, y)
