@@ -272,3 +272,57 @@ class SnakeGameAI:
 
         return np.array(state, dtype=np.float32)
 
+    # ── Rendering ────────────────────────────────────────────────────────
+
+    def render(self, episode: int = 0, record: int = 0):
+        """Draw the full game frame."""
+        cs = config.CELL_SIZE
+
+        # Background
+        self.display.fill(config.COLOR_BG)
+
+        # Grid lines (subtle)
+        for x in range(0, self.w, cs):
+            pygame.draw.line(self.display, config.COLOR_GRID, (x, 0), (x, self.h))
+        for y in range(0, self.h, cs):
+            pygame.draw.line(self.display, config.COLOR_GRID, (0, y), (self.w, y))
+
+        # Snake body
+        for i, pt in enumerate(self.snake):
+            color = config.COLOR_SNAKE_HEAD if i == 0 else config.COLOR_SNAKE_BODY
+            rect  = pygame.Rect(pt.x + 2, pt.y + 2, cs - 4, cs - 4)
+            pygame.draw.rect(self.display, color, rect, border_radius=6)
+
+            # Eye on head
+            if i == 0:
+                eye_radius = 3
+                eye_offset = cs // 4
+                if self.direction == Direction.RIGHT:
+                    eyes = [(pt.x + cs - eye_offset, pt.y + eye_offset),
+                            (pt.x + cs - eye_offset, pt.y + cs - eye_offset)]
+                elif self.direction == Direction.LEFT:
+                    eyes = [(pt.x + eye_offset, pt.y + eye_offset),
+                            (pt.x + eye_offset, pt.y + cs - eye_offset)]
+                elif self.direction == Direction.DOWN:
+                    eyes = [(pt.x + eye_offset, pt.y + cs - eye_offset),
+                            (pt.x + cs - eye_offset, pt.y + cs - eye_offset)]
+                else:  # UP
+                    eyes = [(pt.x + eye_offset, pt.y + eye_offset),
+                            (pt.x + cs - eye_offset, pt.y + eye_offset)]
+                for eye in eyes:
+                    pygame.draw.circle(self.display, config.COLOR_BG, eye, eye_radius)
+
+        # Food (pulsing circle)
+        food_rect = pygame.Rect(self.food.x + 4, self.food.y + 4, cs - 8, cs - 8)
+        pygame.draw.ellipse(self.display, config.COLOR_FOOD, food_rect)
+
+        # HUD bar at bottom
+        hud_y = self.h + 5
+        score_surf  = self.font_large.render(f"Score: {self.score}", True, config.COLOR_SCORE)
+        ep_surf     = self.font_small.render(f"Episode: {episode}  |  Record: {record}", True, config.COLOR_TEXT)
+        self.display.blit(score_surf, (10, hud_y))
+        self.display.blit(ep_surf,   (self.w - ep_surf.get_width() - 10, hud_y + 5))
+
+        pygame.display.flip()
+        self.clock.tick(config.GAME_SPEED)
+
