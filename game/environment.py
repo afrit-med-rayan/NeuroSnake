@@ -151,3 +151,54 @@ class SnakeGameAI:
         elif self.direction == Direction.UP:    y -= cs
 
         self.head = Point(x, y)
+
+    # ── Core Step ───────────────────────────────────────────────────────
+
+    def step(self, action: list):
+        """
+        Execute one game step.
+
+        Args:
+            action: One-hot list [straight, right, left]
+
+        Returns:
+            reward  (float)
+            done    (bool)   — True if game over
+            score   (int)
+        """
+        self.frame_iter += 1
+
+        # 1. Handle Pygame quit event (when rendering)
+        if self.render_mode:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+        # 2. Move
+        self._move(action)
+        self.snake.insert(0, self.head)
+
+        # 3. Check collision / timeout
+        reward = config.REWARD_STEP
+        done   = False
+
+        if self._is_collision() or self.frame_iter > config.MAX_STEPS:
+            reward = config.REWARD_DEATH
+            done   = True
+            return reward, done, self.score
+
+        # 4. Check food
+        if self.head == self.food:
+            self.score += 1
+            reward = config.REWARD_FOOD
+            self._place_food()
+        else:
+            self.snake.pop()   # Remove tail (no growth)
+
+        # 5. Render
+        if self.render_mode:
+            self.render()
+
+        return reward, done, self.score
+
