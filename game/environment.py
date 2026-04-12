@@ -326,3 +326,81 @@ class SnakeGameAI:
         pygame.display.flip()
         self.clock.tick(config.GAME_SPEED)
 
+
+# ─────────────────────────────────────────────
+# HUMAN PLAY MODE
+# ─────────────────────────────────────────────
+
+class HumanGame:
+    """
+    Keyboard-controlled Snake game.
+    Controls: Arrow keys or WASD. ESC or close window to quit.
+    """
+
+    def __init__(self):
+        pygame.init()
+        self.w = config.WINDOW_W
+        self.h = config.WINDOW_H
+        self.display = pygame.display.set_mode((self.w, self.h + 50))
+        pygame.display.set_caption("NeuroSnake — Human Play")
+        self.clock = pygame.time.Clock()
+        pygame.font.init()
+        self.font_large = pygame.font.SysFont("consolas", 28, bold=True)
+        self.font_small = pygame.font.SysFont("consolas", 18)
+        self._reset()
+
+    def _reset(self):
+        cs   = config.CELL_SIZE
+        mid_x = (config.GRID_SIZE // 2) * cs
+        mid_y = (config.GRID_SIZE // 2) * cs
+        self.direction = Direction.RIGHT
+        self.head  = Point(mid_x, mid_y)
+        self.snake = [
+            self.head,
+            Point(self.head.x - cs,     self.head.y),
+            Point(self.head.x - 2 * cs, self.head.y),
+        ]
+        self.score     = 0
+        self.game_over = False
+        self._place_food()
+
+    def _place_food(self):
+        cs = config.CELL_SIZE
+        while True:
+            x = random.randint(0, config.GRID_SIZE - 1) * cs
+            y = random.randint(0, config.GRID_SIZE - 1) * cs
+            self.food = Point(x, y)
+            if self.food not in self.snake:
+                break
+
+    def _is_collision(self, point: Point = None) -> bool:
+        if point is None:
+            point = self.head
+        cs = config.CELL_SIZE
+        gs = config.GRID_SIZE
+        if point.x < 0 or point.x >= gs * cs or point.y < 0 or point.y >= gs * cs:
+            return True
+        if point in self.snake[1:]:
+            return True
+        return False
+
+    def _step(self):
+        cs = config.CELL_SIZE
+        x, y = self.head.x, self.head.y
+        if   self.direction == Direction.RIGHT: x += cs
+        elif self.direction == Direction.LEFT:  x -= cs
+        elif self.direction == Direction.DOWN:  y += cs
+        elif self.direction == Direction.UP:    y -= cs
+        self.head = Point(x, y)
+        self.snake.insert(0, self.head)
+
+        if self._is_collision():
+            self.game_over = True
+            return
+
+        if self.head == self.food:
+            self.score += 1
+            self._place_food()
+        else:
+            self.snake.pop()
+
