@@ -202,3 +202,73 @@ class SnakeGameAI:
 
         return reward, done, self.score
 
+    # ── State Vector ─────────────────────────────────────────────────────
+
+    def get_state(self) -> np.ndarray:
+        """
+        Build the 11-feature state vector:
+
+        Index  Feature
+        ─────  ──────────────────────────────
+        0      Danger STRAIGHT
+        1      Danger RIGHT
+        2      Danger LEFT
+        3      Moving RIGHT
+        4      Moving DOWN
+        5      Moving LEFT
+        6      Moving UP
+        7      Food is LEFT  of head
+        8      Food is RIGHT of head
+        9      Food is UP    of head
+        10     Food is DOWN  of head
+
+        Returns:
+            np.ndarray shape (11,) dtype float32
+        """
+        cs   = config.CELL_SIZE
+        head = self.head
+        d    = self.direction
+
+        # Points one step ahead in each relative direction
+        point_r = Point(head.x + cs, head.y)
+        point_d = Point(head.x,      head.y + cs)
+        point_l = Point(head.x - cs, head.y)
+        point_u = Point(head.x,      head.y - cs)
+
+        dir_r = (d == Direction.RIGHT)
+        dir_d = (d == Direction.DOWN)
+        dir_l = (d == Direction.LEFT)
+        dir_u = (d == Direction.UP)
+
+        state = [
+            # ── Danger relative to current direction ──────────────────
+            # Danger straight
+            (dir_r and self._is_collision(point_r)) or
+            (dir_d and self._is_collision(point_d)) or
+            (dir_l and self._is_collision(point_l)) or
+            (dir_u and self._is_collision(point_u)),
+
+            # Danger right (clock-wise from current)
+            (dir_r and self._is_collision(point_d)) or
+            (dir_d and self._is_collision(point_l)) or
+            (dir_l and self._is_collision(point_u)) or
+            (dir_u and self._is_collision(point_r)),
+
+            # Danger left (counter-clock-wise from current)
+            (dir_r and self._is_collision(point_u)) or
+            (dir_d and self._is_collision(point_r)) or
+            (dir_l and self._is_collision(point_d)) or
+            (dir_u and self._is_collision(point_l)),
+
+            # ── Current direction (one-hot) ───────────────────────────
+            dir_r, dir_d, dir_l, dir_u,
+
+            # ── Food location relative to head ─────────────────────────
+            self.food.x < head.x,   # Food LEFT
+            self.food.x > head.x,   # Food RIGHT
+            self.food.y < head.y,   # Food UP
+            self.food.y > head.y,   # Food DOWN
+        ]
+
+        return np.array(state, dtype=np.float32)
+
