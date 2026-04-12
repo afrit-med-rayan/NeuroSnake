@@ -404,3 +404,74 @@ class HumanGame:
         else:
             self.snake.pop()
 
+    def run(self):
+        """Main game loop for human player. Blocks until window is closed."""
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        return
+                    if self.game_over and event.key == pygame.K_r:
+                        self._reset()
+                        continue
+                    # Direction keys (prevent 180° reversal)
+                    if event.key in (pygame.K_RIGHT, pygame.K_d) and self.direction != Direction.LEFT:
+                        self.direction = Direction.RIGHT
+                    elif event.key in (pygame.K_LEFT, pygame.K_a) and self.direction != Direction.RIGHT:
+                        self.direction = Direction.LEFT
+                    elif event.key in (pygame.K_DOWN, pygame.K_s) and self.direction != Direction.UP:
+                        self.direction = Direction.DOWN
+                    elif event.key in (pygame.K_UP, pygame.K_w) and self.direction != Direction.DOWN:
+                        self.direction = Direction.UP
+
+            if not self.game_over:
+                self._step()
+
+            self._render()
+            self.clock.tick(config.HUMAN_SPEED)
+
+    def _render(self):
+        cs = config.CELL_SIZE
+        self.display.fill(config.COLOR_BG)
+
+        # Grid
+        for x in range(0, self.w, cs):
+            pygame.draw.line(self.display, config.COLOR_GRID, (x, 0), (x, self.h))
+        for y in range(0, self.h, cs):
+            pygame.draw.line(self.display, config.COLOR_GRID, (0, y), (self.w, y))
+
+        # Snake
+        for i, pt in enumerate(self.snake):
+            color = config.COLOR_SNAKE_HEAD if i == 0 else config.COLOR_SNAKE_BODY
+            pygame.draw.rect(self.display, color,
+                             pygame.Rect(pt.x + 2, pt.y + 2, cs - 4, cs - 4),
+                             border_radius=6)
+
+        # Food
+        pygame.draw.ellipse(self.display, config.COLOR_FOOD,
+                            pygame.Rect(self.food.x + 4, self.food.y + 4, cs - 8, cs - 8))
+
+        # HUD
+        score_surf = self.font_large.render(f"Score: {self.score}", True, config.COLOR_SCORE)
+        self.display.blit(score_surf, (10, self.h + 5))
+
+        if self.game_over:
+            # Overlay
+            overlay = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
+            self.display.blit(overlay, (0, 0))
+
+            go_surf  = self.font_large.render("GAME OVER", True, config.COLOR_FOOD)
+            sc_surf  = self.font_large.render(f"Score: {self.score}", True, config.COLOR_SCORE)
+            re_surf  = self.font_small.render("Press R to restart  |  ESC to quit", True, config.COLOR_TEXT)
+            self.display.blit(go_surf, (self.w // 2 - go_surf.get_width() // 2, self.h // 2 - 60))
+            self.display.blit(sc_surf, (self.w // 2 - sc_surf.get_width() // 2, self.h // 2 - 10))
+            self.display.blit(re_surf, (self.w // 2 - re_surf.get_width() // 2, self.h // 2 + 40))
+
+        pygame.display.flip()
+
+
