@@ -42,6 +42,8 @@ class Trainer:
             self.agent.decay_epsilon()
             if episode % TARGET_UPDATE_FREQ == 0:
                 self.agent.update_target()
+                
+            print(f"Episode: {episode}/{NUM_EPISODES} | Score: {score} | Record: {self.record} | Mean: {mean_score:.2f} | Epsilon: {self.agent.epsilon:.3f}")
 
 if __name__ == '__main__':
     trainer = Trainer()
