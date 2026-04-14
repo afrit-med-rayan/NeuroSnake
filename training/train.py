@@ -3,6 +3,12 @@ from game.environment import SnakeGameAI
 from ai.agent import Agent
 from config import NUM_EPISODES, MAX_STEPS, MEAN_WINDOW, TARGET_UPDATE_FREQ, MODEL_PATH
 
+try:
+    from utils.plot import plot
+except ImportError:
+    def plot(scores, mean_scores, filename=None, save_only=False):
+        pass
+
 class Trainer:
     """Handles the training loop for the Agent."""
     def __init__(self):
@@ -45,6 +51,8 @@ class Trainer:
                 self.agent.update_target()
                 
             print(f"Episode: {episode}/{NUM_EPISODES} | Score: {score} | Record: {self.record} | Mean: {mean_score:.2f} | Epsilon: {self.agent.epsilon:.3f}")
+            
+            plot(self.scores, self.mean_scores)
 
 if __name__ == '__main__':
     trainer = Trainer()
