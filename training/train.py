@@ -1,7 +1,7 @@
 import numpy as np
 from game.environment import SnakeGameAI
 from ai.agent import Agent
-from config import NUM_EPISODES, MAX_STEPS, MEAN_WINDOW, TARGET_UPDATE_FREQ
+from config import NUM_EPISODES, MAX_STEPS, MEAN_WINDOW, TARGET_UPDATE_FREQ, MODEL_PATH
 
 class Trainer:
     """Handles the training loop for the Agent."""
@@ -38,6 +38,7 @@ class Trainer:
             
             if score > self.record:
                 self.record = score
+                self.agent.online_net.save(MODEL_PATH)
                 
             self.agent.decay_epsilon()
             if episode % TARGET_UPDATE_FREQ == 0:
