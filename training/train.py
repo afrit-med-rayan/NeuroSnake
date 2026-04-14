@@ -1,7 +1,7 @@
 import numpy as np
 from game.environment import SnakeGameAI
 from ai.agent import Agent
-from config import NUM_EPISODES, MAX_STEPS, MEAN_WINDOW, TARGET_UPDATE_FREQ, MODEL_PATH
+from config import NUM_EPISODES, MAX_STEPS, MEAN_WINDOW, TARGET_UPDATE_FREQ, MODEL_PATH, PLOT_OUTPUT_PATH
 
 try:
     from utils.plot import plot
@@ -53,6 +53,9 @@ class Trainer:
             print(f"Episode: {episode}/{NUM_EPISODES} | Score: {score} | Record: {self.record} | Mean: {mean_score:.2f} | Epsilon: {self.agent.epsilon:.3f}")
             
             plot(self.scores, self.mean_scores)
+            
+        print("Training completed!")
+        plot(self.scores, self.mean_scores, filename=PLOT_OUTPUT_PATH, save_only=True)
 
 if __name__ == '__main__':
     trainer = Trainer()
