@@ -23,6 +23,8 @@
 
 ## 🧠 Overview
 
+![Gameplay Screenshot](docs/assets/gameplay.png)
+
 **NeuroSnake** teaches a neural network to play Snake from absolute zero — no hardcoded rules, no lookahead algorithms. The agent observes an 11-feature state vector, picks actions using a Deep Q-Network, and learns purely through trial and error guided by a sparse reward signal.
 
 Training leverages two core DRL stabilisation techniques:
@@ -249,6 +251,8 @@ Loads the saved `models/dqn_snake.pth` weights and watches the agent play.
 2. **100–300 episodes**: The agent learns to avoid walls. The average score starts to climb.
 3. **300–600 episodes**: The agent reliably tracks the food. High scores will exceed 30–40.
 4. **600+ episodes**: The agent develops routing strategies to avoid getting trapped by its own tail.
+
+![Training Curve](docs/assets/training_curve.png)
 
 A typical run will result in a `training_curve.png` resembling a logarithmic growth curve, settling around a mean score of 35-50 depending on the `GRID_SIZE` and random seed.
 
