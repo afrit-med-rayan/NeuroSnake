@@ -210,3 +210,33 @@ pip install torch pygame numpy matplotlib
 python -c "import torch, pygame, numpy, matplotlib; print('All dependencies OK')"
 ```
 
+---
+
+## 🚀 Usage
+
+The project is driven by a single unified CLI entry point: `main.py`.
+
+### 1. Train the Agent
+
+```bash
+python main.py train
+```
+Watch the AI learn from scratch. A Pygame window displays the agent's actions, while a live Matplotlib chart plots the score and the rolling 100-episode mean.
+- The model automatically saves the best run to `models/dqn_snake.pth`.
+- Training will run for `NUM_EPISODES` (configurable in `config.py`).
+
+### 2. Play Manually
+
+```bash
+python main.py human
+```
+Play the game yourself using **Arrow Keys** or **W A S D**. Press **R** to restart after game over, or **ESC** to quit.
+
+### 3. Evaluate the Agent
+
+```bash
+python main.py eval
+```
+Loads the saved `models/dqn_snake.pth` weights and watches the agent play. 
+- Exploration is completely disabled (`ε = 0`).
+- The agent plays greedily using the learned Q-values.
