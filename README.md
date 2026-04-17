@@ -99,4 +99,32 @@ The agent picks the action with the highest Q-value during exploitation, or a ra
 | Optimizer | Adam (lr = 0.001) | Adaptive learning rate — robust across hyperparameter ranges |
 | Discount factor | γ = 0.99 | High future-reward weight encourages survival |
 
+---
+
+## 📡 State Representation (11 Features)
+
+The agent never sees raw pixels. Instead, each game frame is encoded as **11 binary floats** — a compact but complete description of the snake's immediate situation.
+
+```
+State vector  =  [ danger×3 | direction×4 | food×4 ]
+```
+
+| Index | Category | Feature | Value |
+|-------|----------|---------|-------|
+| `0` | ⚠️ Danger | **Straight** — collision one step ahead in current direction | 0 / 1 |
+| `1` | ⚠️ Danger | **Right** — collision one step to the right (clock-wise) | 0 / 1 |
+| `2` | ⚠️ Danger | **Left** — collision one step to the left (counter-CW) | 0 / 1 |
+| `3` | 🧭 Direction | Moving **RIGHT** | 0 / 1 |
+| `4` | 🧭 Direction | Moving **DOWN** | 0 / 1 |
+| `5` | 🧭 Direction | Moving **LEFT** | 0 / 1 |
+| `6` | 🧭 Direction | Moving **UP** | 0 / 1 |
+| `7` | 🍎 Food | Food is to the **LEFT** of head | 0 / 1 |
+| `8` | 🍎 Food | Food is to the **RIGHT** of head | 0 / 1 |
+| `9` | 🍎 Food | Food is **ABOVE** head | 0 / 1 |
+| `10` | 🍎 Food | Food is **BELOW** head | 0 / 1 |
+
+> All features are `float32`. The direction block is one-hot (exactly one of indices 3–6 is `1`). The danger and food blocks can be multi-hot.
+
+**Why only 11 features?**  
+A CNN reading raw pixels needs millions of parameters and hours of GPU training. An 11-feature hand-crafted state lets a tiny 3-layer MLP learn effective play in under 20 minutes on CPU — no GPU required.
 
