@@ -18,7 +18,7 @@ env/
 # models/*.pth
 
 # Matplotlib output
-training_curve.png
+/training_curve.png
 
 # Jupyter
 .ipynb_checkpoints/
