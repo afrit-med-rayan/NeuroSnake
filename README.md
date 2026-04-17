@@ -224,6 +224,9 @@ The project is driven by a single unified CLI entry point: `main.py`.
 python main.py train
 ```
 Watch the AI learn from scratch. A Pygame window displays the agent's actions, while a live Matplotlib chart plots the score and the rolling 100-episode mean.
+
+![Training Curve](docs/assets/training_curve.png)
+
 - The model automatically saves the best run to `models/dqn_snake.pth`.
 - Training will run for `NUM_EPISODES` (configurable in `config.py`).
 
