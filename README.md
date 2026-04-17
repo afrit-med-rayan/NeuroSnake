@@ -168,3 +168,45 @@ Minimise MSE loss: L = (Q_online(s,a) − target)²
 Every 10 episodes: copy Q_online weights → Q_target
 ```
 
+---
+
+## ⚙️ Installation
+
+### Prerequisites
+
+| Dependency | Version | Purpose |
+|-----------|---------|---------|
+| Python | 3.10+ | Core language |
+| PyTorch | 2.x | Neural network & autograd |
+| Pygame | 2.x | Game rendering & input |
+| NumPy | 1.x+ | State array operations |
+| Matplotlib | 3.x | Live training curve |
+
+### Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/afrit-med-rayan/NeuroSnake.git
+cd NeuroSnake
+
+# 2. Create and activate a virtual environment (recommended)
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+
+# 3. Install all dependencies
+pip install torch pygame numpy matplotlib
+```
+
+> **GPU support (optional):** NeuroSnake trains comfortably on CPU. To use a CUDA GPU, install the matching PyTorch build from [pytorch.org/get-started](https://pytorch.org/get-started/locally/). The agent will automatically detect and use CUDA if available.
+
+### Verify Installation
+
+```bash
+python -c "import torch, pygame, numpy, matplotlib; print('All dependencies OK')"
+```
+
