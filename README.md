@@ -240,3 +240,25 @@ python main.py eval
 Loads the saved `models/dqn_snake.pth` weights and watches the agent play. 
 - Exploration is completely disabled (`ε = 0`).
 - The agent plays greedily using the learned Q-values.
+
+---
+
+## 📊 Expected Results
+
+1. **0–100 episodes**: The agent moves semi-randomly, frequently crashing into walls and exploring the space.
+2. **100–300 episodes**: The agent learns to avoid walls. The average score starts to climb.
+3. **300–600 episodes**: The agent reliably tracks the food. High scores will exceed 30–40.
+4. **600+ episodes**: The agent develops routing strategies to avoid getting trapped by its own tail.
+
+A typical run will result in a `training_curve.png` resembling a logarithmic growth curve, settling around a mean score of 35-50 depending on the `GRID_SIZE` and random seed.
+
+---
+
+## 🔮 Future Improvements
+
+While this DQN agent plays successfully, it does not achieve "perfect play" (filling the entire board). Potential avenues for future iteration:
+
+- **CNN + Frame Stacking:** Replace the 11-feature state with 4 stacked pixel frames and use Convolutional layers.
+- **Double DQN (DDQN):** Decouple action selection from action evaluation to reduce overestimation bias in Q-values.
+- **Prioritized Experience Replay (PER):** Sample experiences with high TD-error more frequently to speed up learning.
+- **Dueling DQN:** Separate the estimation of state value `V(s)` and action advantage `A(s, a)` to stabilize learning when actions don't highly influence the state value.
