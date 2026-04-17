@@ -26,15 +26,22 @@ class Trainer:
             score = 0
             
             for step in range(MAX_STEPS):
-                action = self.agent.get_action(state)
-                next_state, reward, done, current_score = self.env.step(action)
-                
-                self.agent.remember(state, action, reward, next_state, done)
+                # agent returns a scalar action index (0/1/2)
+                action_idx = self.agent.get_action(state)
+
+                # env.step() expects a one-hot list [straight, right, left]
+                action_onehot = [0, 0, 0]
+                action_onehot[action_idx] = 1
+
+                # env.step() returns (reward, done, score)
+                reward, done, score = self.env.step(action_onehot)
+                next_state = self.env.get_state()
+
+                self.agent.remember(state, action_idx, reward, next_state, done)
                 self.agent.train_step()
-                
+
                 state = next_state
-                score = current_score
-                
+
                 if done:
                     break
                     
