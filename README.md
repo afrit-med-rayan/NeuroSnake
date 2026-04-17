@@ -128,3 +128,43 @@ State vector  =  [ danger×3 | direction×4 | food×4 ]
 **Why only 11 features?**  
 A CNN reading raw pixels needs millions of parameters and hours of GPU training. An 11-feature hand-crafted state lets a tiny 3-layer MLP learn effective play in under 20 minutes on CPU — no GPU required.
 
+---
+
+## 🏆 Reward System
+
+The reward signal is deliberately sparse and simple — the agent must figure out everything else through Q-learning.
+
+| Event | Reward | Rationale |
+|-------|--------|-----------|
+| 🍎 Food collected | **+10.0** | Strong positive signal — the primary objective |
+| 💀 Wall or self collision | **−10.0** | Strong negative signal — death is catastrophic |
+| ⏱️ Each step taken | **−0.1** | Small penalty discourages aimless wandering and infinite loops |
+| ⏰ Timeout (> max steps) | **−10.0** | Treated as death — prevents the snake from spinning forever |
+
+> **Max steps per episode** = `GRID_SIZE × GRID_SIZE × 2` = 800 steps on the default 20×20 grid.
+
+### How the Agent Learns
+
+```
+Episode starts
+    │
+    ▼
+Agent sees state s  ─► picks action a (ε-greedy)
+    │
+    ▼
+Environment returns reward r, next state s', done flag
+    │
+    ▼
+Experience (s, a, r, s', done) → pushed to Replay Buffer
+    │
+    ▼
+Random batch sampled → compute TD target:
+    target = r + γ · max Q_target(s') · (1 − done)
+    │
+    ▼
+Minimise MSE loss: L = (Q_online(s,a) − target)²
+    │
+    ▼
+Every 10 episodes: copy Q_online weights → Q_target
+```
+
